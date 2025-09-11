@@ -1,4 +1,4 @@
-name: CI - Secret Scan
+name: CI - Secret Scan, Docker Build & Push
 
 on:
   push:
@@ -51,4 +51,4 @@ jobs:
       - name: Push the docker image
         run: |
           docker login -u dimitrisstyl7 -p ${{ secrets.DOCKERHUB_TOKEN }}
-          docker push dimitrisstyl7/devsecops-demo:latest
+          docker push dimitrisstyl7/juice-shop:latest
