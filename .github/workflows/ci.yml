@@ -38,3 +38,17 @@ jobs:
         run: |
           echo "🚨 Secrets were detected - aborting the workflow."
           exit 1
+
+  build:
+    needs: truffleHog
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Build the docker image
+        run: docker build . --file Dockerfile --tag dimitrisstyl7/juice-shop:latest
+
+      - name: Push the docker image
+        run: |
+          docker login -u dimitrisstyl7 -p ${{ secrets.DOCKERHUB_TOKEN }}
+          docker push dimitrisstyl7/devsecops-demo:latest
