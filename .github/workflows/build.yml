@@ -5,7 +5,7 @@ on:
   workflow_call:
     inputs:
       ref:
-        description: Git ref to checkout (branch, tag, SHA)
+        description: Git ref to checkout
         required: true
         type: string
     secrets:
