@@ -1,5 +1,5 @@
 # .github/workflows/ci.yml
-name: CI - TruffleHog Secrets Scan → Docker Build & Push
+name: CI - TruffleHog Secrets Scan, Snyk Vulnerabilities Scan → Docker Build & Push
 
 on:
   push:
@@ -19,6 +19,13 @@ jobs:
     with:
       ref: ${{ github.ref_name }}
 
+  snyk:
+    uses: ./.github/workflows/snyk.yml
+    with:
+      ref: ${{ github.ref_name }}
+    secrets:
+      SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
+
   show_trufflehog_output:
     needs: trufflehog
     runs-on: ubuntu-latest
@@ -28,9 +35,18 @@ jobs:
         run: |
           echo "secrets_found = ${{ needs.trufflehog.outputs.secrets_found }}"
 
+  show_snyk_output:
+    needs: snyk
+    runs-on: ubuntu-latest
+    if: always()
+    steps:
+      - name: Echo the Snyk Scan Result
+        run: |
+          echo "vulnerabilities_found = ${{ needs.snyk.outputs.vulnerabilities_found }}"
+
   build:
-    needs: trufflehog
-    if: ${{ needs.trufflehog.outputs.secrets_found == 'false' }}
+    needs: [trufflehog, snyk]
+    if: ${{ needs.trufflehog.outputs.secrets_found == 'false' && needs.snyk.outputs.vulnerabilities_found == 'false' }}
     uses: ./.github/workflows/build.yml
     with:
       ref: ${{ github.ref_name }}
