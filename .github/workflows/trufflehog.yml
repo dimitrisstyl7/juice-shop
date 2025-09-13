@@ -23,7 +23,7 @@ jobs:
       secrets_found: ${{ steps.set_output.outputs.secrets_found }} # Expose output from this job
     steps:
       - name: Checkout the code
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
         with:
           fetch-depth: 0  # get the full history
           ref: ${{ inputs.ref }}
