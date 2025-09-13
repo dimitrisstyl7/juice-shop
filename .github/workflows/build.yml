@@ -1,0 +1,36 @@
+# .github/workflows/build.yml
+name: Docker Build & Push
+
+on:
+  workflow_call:
+    inputs:
+      ref:
+        description: Git ref to checkout (branch, tag, SHA)
+        required: true
+        type: string
+    secrets:
+      DOCKERHUB_TOKEN:
+        required: true
+
+jobs:
+  build-and-push:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout the code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0  # get the full history
+          ref: ${{ inputs.ref }}
+
+      - name: Build the Docker image
+        run: docker build . -f Dockerfile -t dimitrisstyl7/juice-shop:latest
+
+      - name: Push the Docker image
+        env:
+          DOCKERHUB_TOKEN: ${{ secrets.DOCKERHUB_TOKEN }}  # injected securely
+        run: |
+          # Log in to Docker Hub using STDIN - the token never appears in the command line
+          echo "$DOCKERHUB_TOKEN" | docker login -u dimitrisstyl7 --password-stdin
+
+          # Push the image
+          docker push dimitrisstyl7/juice-shop:latest

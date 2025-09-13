@@ -1,0 +1,44 @@
+# .github/workflows/trufflehog.yml
+name: TruffleHog Secret Scan
+
+on:
+  workflow_call:
+    inputs:
+      ref:
+        description: Git ref to scan
+        required: true
+        type: string
+
+jobs:
+  scan:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        shell: bash
+    outputs:
+      secrets_found: ${{ steps.set_output.secrets_found }}
+    steps:
+      - name: Checkout the code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0  # get the full history
+          ref: ${{ inputs.ref }}
+
+      - name: TruffleHog Secret Scanning
+        id: trufflehog
+        uses: trufflesecurity/trufflehog@main
+        continue-on-error: true
+        with:
+          base: ""  # scan entire branch
+          head: ${{ inputs.ref }}
+          extra_args: --results=verified,unknown
+
+      # Expose a boolean output that downstream workflows can read
+      - name: Set result output
+        id: set_output
+        run: |
+          if [[ "${{ steps.trufflehog.outcome }}" == "failure" ]]; then
+            echo "secrets_found=true" >> $GITHUB_OUTPUT
+          else
+            echo "secrets_found=false" >> $GITHUB_OUTPUT
+          fi
