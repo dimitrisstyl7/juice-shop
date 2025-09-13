@@ -1,0 +1,56 @@
+# .github/workflows/semgrep.yml
+name: Semgrep Scan
+
+on:
+  workflow_call:
+    inputs:
+      ref:
+        description: Git ref to scan
+        required: true
+        type: string
+    secrets:
+      SEMGREP_TOKEN:
+        required: true
+    outputs:
+      vulnerabilities_found:  # This is the output that ci.yml will read
+        description: True if vulnerabilities were found
+        value: ${{ jobs.scan.outputs.vulnerabilities_found }} # This references the job-level output
+
+jobs:
+  scan:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        shell: bash
+    outputs:
+      vulnerabilities_found: ${{ steps.set_output.outputs.vulnerabilities_found }} # Expose output from this job
+
+    container:
+      # A Docker image with Semgrep installed.
+      image: semgrep/semgrep
+
+    # Skip any PR created by dependabot to avoid permission issues:
+    if: (github.actor != 'dependabot[bot]')
+
+    steps:
+      - name: Checkout the code
+        uses: actions/checkout@v5
+        with:
+          ref: ${{ inputs.ref }}
+
+      # Run the "semgrep ci" command on the command line of the docker image.
+      - name: Run Semgrep
+        id: semgrep
+        run: semgrep ci
+        continue-on-error: true 
+        env:
+          SEMGREP_APP_TOKEN: ${{ secrets.SEMGREP_TOKEN }}
+
+      - name: Set result output
+        id: set_output
+        run: |
+          if [[ "${{ steps.semgrep.outcome }}" == "failure" ]]; then
+            echo "vulnerabilities_found=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "vulnerabilities_found=false" >> "$GITHUB_OUTPUT"
+          fi

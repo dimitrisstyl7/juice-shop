@@ -26,6 +26,13 @@ jobs:
     secrets:
       SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
 
+  semgrep:
+    uses: ./.github/workflows/semgrep.yml
+    with:
+      ref: ${{ github.ref_name }}
+    secrets:
+      SNYK_TOKEN: ${{ secrets.SEMGREP_TOKEN }}
+
   show_trufflehog_output:
     needs: trufflehog
     runs-on: ubuntu-latest
@@ -43,6 +50,15 @@ jobs:
       - name: Echo the Snyk Scan Result
         run: |
           echo "vulnerabilities_found = ${{ needs.snyk.outputs.vulnerabilities_found }}"
+
+  show_semgrep_output:
+    needs: semgrep
+    runs-on: ubuntu-latest
+    if: always()
+    steps:
+      - name: Echo the Semgrep Scan Result
+        run: |
+          echo "vulnerabilities_found = ${{ needs.semgrep.outputs.vulnerabilities_found }}"
 
   build:
     needs: [trufflehog, snyk]
