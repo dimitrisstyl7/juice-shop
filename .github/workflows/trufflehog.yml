@@ -16,7 +16,7 @@ jobs:
       run:
         shell: bash
     outputs:
-      secrets_found: ${{ steps.set_output.secrets_found }}
+      secrets_found: ${{ steps.set_output.outputs.secrets_found }}
     steps:
       - name: Checkout the code
         uses: actions/checkout@v4
