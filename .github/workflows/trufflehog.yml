@@ -9,9 +9,9 @@ on:
         required: true
         type: string
     outputs:
-      shared_variable:
+      secrets_found:  # This is the output that ci.yml will read
         description: True if secrets were found
-        value: ${{ jobs.scan.outputs.secrets_found }}
+        value: ${{ jobs.scan.outputs.secrets_found }} # This references the job-level output
 
 jobs:
   scan:
@@ -20,7 +20,7 @@ jobs:
       run:
         shell: bash
     outputs:
-      secrets_found: ${{ steps.set_output.outputs.secrets_found }}
+      secrets_found: ${{ steps.set_output.outputs.secrets_found }} # Expose output from this job
     steps:
       - name: Checkout the code
         uses: actions/checkout@v4
@@ -37,7 +37,6 @@ jobs:
           head: ${{ inputs.ref }}
           extra_args: --results=verified,unknown
 
-      # Expose a boolean output that downstream workflows can read
       - name: Set result output
         id: set_output
         run: |
