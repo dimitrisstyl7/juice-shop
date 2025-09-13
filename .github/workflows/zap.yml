@@ -40,7 +40,7 @@ jobs:
           token: ${{ secrets.GITHUB_TOKEN }}
           target: 'http://localhost:3000'
           allow_issue_writing: false
-          rules_file_name: '.zap/rules.tsv'
+          # rules_file_name: '.zap/rules.tsv'
           cmd_options: '-a -j'
           # -a: include the alpha passive scan rules as well
           # -j: use the Ajax spider in addition to the traditional one
