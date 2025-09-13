@@ -1,0 +1,54 @@
+# .github/workflows/zap.yml
+name: Zap Baseline Scan
+
+on:
+  workflow_call:
+    inputs:
+      ref:
+        description: Git ref to scan
+        required: true
+        type: string
+    outputs:
+      vulnerabilities_found:  # This is the output that ci.yml will read
+        description: True if vulnerabilities were found
+        value: ${{ jobs.scan.outputs.vulnerabilities_found }} # This references the job-level output
+
+jobs:
+  scan:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        shell: bash
+    outputs:
+      vulnerabilities_found: ${{ steps.set_output.outputs.vulnerabilities_found }} # Expose output from this job
+    steps:
+      - name: Checkout the code
+        uses: actions/checkout@v5
+        with:
+          ref: ${{ inputs.ref }}
+
+      - name: Build the Docker image
+        run: docker build . -f Dockerfile -t dimitrisstyl7/juice-shop:latest
+
+      - name: Run the Docker image
+        run: docker run -d -p 3000:3000 --name juice-shop dimitrisstyl7/juice-shop:latest
+
+      - name: Zap Baseline Scanning
+        id: zap
+        uses: zaproxy/action-baseline@v0.14.0
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          target: 'http://localhost:3000'
+          rules_file_name: '.zap/rules.tsv'
+          cmd_options: '-a -j'
+          # -a: include the alpha passive scan rules as well
+          # -j: use the Ajax spider in addition to the traditional one
+        continue-on-error: true
+
+      - name: Set result output
+        id: set_output
+        run: |
+          if [[ "${{ steps.zap.outcome }}" == "failure" ]]; then
+            echo "vulnerabilities_found=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "vulnerabilities_found=false" >> "$GITHUB_OUTPUT"

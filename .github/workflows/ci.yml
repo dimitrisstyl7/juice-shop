@@ -33,6 +33,11 @@ jobs:
     secrets:
       SEMGREP_TOKEN: ${{ secrets.SEMGREP_TOKEN }}
 
+  zap:
+    uses: ./.github/workflows/zap.yml
+    with:
+      ref: ${{ github.ref_name }}
+
   show-trufflehog-output:
     needs: trufflehog
     runs-on: ubuntu-latest
@@ -60,9 +65,18 @@ jobs:
         run: |
           echo "vulnerabilities_found = ${{ needs.semgrep.outputs.vulnerabilities_found }}"
 
+  show-zap-output:
+    needs: zap
+    runs-on: ubuntu-latest
+    if: always()
+    steps:
+      - name: Echo the Zap Scan Result
+        run: |
+          echo "vulnerabilities_found = ${{ needs.zap.outputs.vulnerabilities_found }}"
+
   build-and-push:
-    needs: [trufflehog, snyk, semgrep]
-    if: ${{ needs.trufflehog.outputs.secrets_found == 'false' && needs.snyk.outputs.vulnerabilities_found == 'false' && needs.semgrep.outputs.vulnerabilities_found == 'false' }}
+    needs: [trufflehog, snyk, semgrep, zap]
+    if: ${{ needs.trufflehog.outputs.secrets_found == 'false' && needs.snyk.outputs.vulnerabilities_found == 'false' && needs.semgrep.outputs.vulnerabilities_found == 'false' && needs.zap.outputs.vulnerabilities_found == 'false' }}
     uses: ./.github/workflows/build_and_push.yml
     with:
       ref: ${{ github.ref_name }}
