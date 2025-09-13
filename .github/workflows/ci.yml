@@ -61,8 +61,11 @@ jobs:
           echo "vulnerabilities_found = ${{ needs.semgrep.outputs.vulnerabilities_found }}"
 
   build:
-    needs: [trufflehog, snyk]
-    if: ${{ needs.trufflehog.outputs.secrets_found == 'false' && needs.snyk.outputs.vulnerabilities_found == 'false' }}
+    needs: [trufflehog, snyk, semgrep]
+    if: |
+      ${{ needs.trufflehog.outputs.secrets_found == 'false' &&
+          needs.snyk.outputs.vulnerabilities_found == 'false' &&
+          needs.semgrep.outputs.vulnerabilities_found == 'false' }}
     uses: ./.github/workflows/build.yml
     with:
       ref: ${{ github.ref_name }}
