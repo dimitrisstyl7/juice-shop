@@ -62,10 +62,7 @@ jobs:
 
   build:
     needs: [trufflehog, snyk, semgrep]
-    if: |
-      ${{ needs.trufflehog.outputs.secrets_found == 'false' &&
-          needs.snyk.outputs.vulnerabilities_found == 'false' &&
-          needs.semgrep.outputs.vulnerabilities_found == 'false' }}
+    if: ${{ needs.trufflehog.outputs.secrets_found == 'false' && needs.snyk.outputs.vulnerabilities_found == 'false' && needs.semgrep.outputs.vulnerabilities_found == 'false' }}
     uses: ./.github/workflows/build.yml
     with:
       ref: ${{ github.ref_name }}
