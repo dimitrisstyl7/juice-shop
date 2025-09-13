@@ -31,7 +31,7 @@ jobs:
     with:
       ref: ${{ github.ref_name }}
     secrets:
-      SNYK_TOKEN: ${{ secrets.SEMGREP_TOKEN }}
+      SEMGREP_TOKEN: ${{ secrets.SEMGREP_TOKEN }}
 
   show_trufflehog_output:
     needs: trufflehog
