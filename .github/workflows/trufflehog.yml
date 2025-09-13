@@ -8,6 +8,10 @@ on:
         description: Git ref to scan
         required: true
         type: string
+    outputs:
+      shared_variable:
+        description: True if secrets were found
+        value: ${{ jobs.scan.outputs.secrets_found }}
 
 jobs:
   scan:
@@ -38,7 +42,7 @@ jobs:
         id: set_output
         run: |
           if [[ "${{ steps.trufflehog.outcome }}" == "failure" ]]; then
-            echo "secrets_found=true" >> $GITHUB_OUTPUT
+            echo "secrets_found=true" >> "$GITHUB_OUTPUT"
           else
-            echo "secrets_found=false" >> $GITHUB_OUTPUT
+            echo "secrets_found=false" >> "$GITHUB_OUTPUT"
           fi
