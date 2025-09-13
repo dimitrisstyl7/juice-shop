@@ -53,3 +53,4 @@ jobs:
             echo "vulnerabilities_found=true" >> "$GITHUB_OUTPUT"
           else
             echo "vulnerabilities_found=false" >> "$GITHUB_OUTPUT"
+          fi
