@@ -19,6 +19,15 @@ jobs:
     with:
       ref: ${{ github.ref_name }}
 
+  show_trufflehog_output:
+    needs: trufflehog
+    runs-on: ubuntu-latest
+    if: always()
+    steps:
+      - name: Echo the TruffleHog Scan Result
+        run: |
+          echo "secrets_found = ${{ needs.trufflehog.outputs.secrets_found }}"
+
   build:
     needs: trufflehog
     if: ${{ needs.trufflehog.outputs.secrets_found == 'false' }}
