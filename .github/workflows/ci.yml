@@ -33,7 +33,7 @@ jobs:
     secrets:
       SEMGREP_TOKEN: ${{ secrets.SEMGREP_TOKEN }}
 
-  show_trufflehog_output:
+  show-trufflehog-output:
     needs: trufflehog
     runs-on: ubuntu-latest
     if: always()
@@ -42,7 +42,7 @@ jobs:
         run: |
           echo "secrets_found = ${{ needs.trufflehog.outputs.secrets_found }}"
 
-  show_snyk_output:
+  show-snyk-output:
     needs: snyk
     runs-on: ubuntu-latest
     if: always()
@@ -51,7 +51,7 @@ jobs:
         run: |
           echo "vulnerabilities_found = ${{ needs.snyk.outputs.vulnerabilities_found }}"
 
-  show_semgrep_output:
+  show-semgrep-output:
     needs: semgrep
     runs-on: ubuntu-latest
     if: always()
