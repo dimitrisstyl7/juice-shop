@@ -41,7 +41,7 @@ jobs:
       # Run the "semgrep ci" command on the command line of the docker image.
       - name: Run Semgrep
         id: semgrep
-        run: semgrep ci
+        run: semgrep ci > semgrep-output.txt
         continue-on-error: true 
         env:
           SEMGREP_APP_TOKEN: ${{ secrets.SEMGREP_TOKEN }}
@@ -49,7 +49,7 @@ jobs:
       - name: Set result output
         id: set_output
         run: |
-          if [[ "${{ steps.semgrep.outcome }}" == "failure" ]]; then
+          if grep -q "Findings: 0" semgrep-output.txt; then
             echo "vulnerabilities_found=true" >> "$GITHUB_OUTPUT"
           else
             echo "vulnerabilities_found=false" >> "$GITHUB_OUTPUT"
