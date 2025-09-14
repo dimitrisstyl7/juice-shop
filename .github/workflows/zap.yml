@@ -8,6 +8,10 @@ on:
         description: Git ref to scan
         required: true
         type: string
+      image_tag:
+        description: Image tag
+        required: true
+        type: string
     outputs:
       vulnerabilities_found:  # This is the output that ci.yml will read
         description: True if vulnerabilities were found
@@ -27,11 +31,8 @@ jobs:
         with:
           ref: ${{ inputs.ref }}
 
-      - name: Build the Docker image
-        run: docker build . -f Dockerfile -t dimitrisstyl7/juice-shop:latest
-
       - name: Run the Docker image
-        run: docker run -d -p 3000:3000 --name juice-shop dimitrisstyl7/juice-shop:latest
+        run: docker run -d -p 3000:3000 --name juice-shop ${{ inputs.image_tag }}
 
       - name: Zap Baseline Scanning
         id: zap
@@ -40,7 +41,7 @@ jobs:
           token: ${{ secrets.GITHUB_TOKEN }}
           target: 'http://localhost:3000'
           allow_issue_writing: false
-          # rules_file_name: '.zap/rules.tsv'
+          rules_file_name: '.zap/rules.tsv'
           cmd_options: '-a -j'
           # -a: include the alpha passive scan rules as well
           # -j: use the Ajax spider in addition to the traditional one
