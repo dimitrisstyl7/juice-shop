@@ -29,7 +29,7 @@ jobs:
       # A Docker image with Semgrep installed.
       image: semgrep/semgrep
 
-    # Skip any PR created by dependabot to avoid permission issues:
+    # Skip any PR created by dependabot to avoid permission issues.
     if: (github.actor != 'dependabot[bot]')
 
     steps:
