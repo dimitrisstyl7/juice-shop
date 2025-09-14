@@ -1,5 +1,5 @@
 # .github/workflows/ci.yml
-name: CI - TruffleHog Secrets Scan, Snyk Vulnerabilities Scan → Docker Build & Push
+name: CI/CD - TruffleHog Secrets Scan, Snyk Vulnerabilities Scan → Docker Build & Push
 
 on:
   push:
