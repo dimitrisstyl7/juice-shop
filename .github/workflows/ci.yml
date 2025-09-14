@@ -43,7 +43,6 @@ jobs:
   show-trufflehog-output:
     needs: trufflehog
     runs-on: ubuntu-latest
-    if: always()
     steps:
       - name: Echo the TruffleHog Scan Result
         run: |
@@ -52,7 +51,6 @@ jobs:
   show-snyk-output:
     needs: snyk
     runs-on: ubuntu-latest
-    if: always()
     steps:
       - name: Echo the Snyk Scan Result
         run: |
@@ -61,7 +59,6 @@ jobs:
   show-semgrep-output:
     needs: semgrep
     runs-on: ubuntu-latest
-    if: always()
     steps:
       - name: Echo the Semgrep Scan Result
         run: |
@@ -70,7 +67,6 @@ jobs:
   show-zap-output:
     needs: zap
     runs-on: ubuntu-latest
-    if: always()
     steps:
       - name: Echo the Zap Scan Result
         run: |
